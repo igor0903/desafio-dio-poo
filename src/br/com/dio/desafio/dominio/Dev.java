@@ -2,6 +2,7 @@ package br.com.dio.desafio.dominio;
 
 import java.util.LinkedHashSet;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 
 public class Dev {
@@ -11,15 +12,23 @@ public class Dev {
     private Set<Conteudo> conteudosAprovados = new LinkedHashSet<>();
 
     public void inscreverBootcamp(Bootcamp bootcamp) {
-
+        this.conteudosInscritos.addAll(bootcamp.getConteudos());
+        bootcamp.getDevsInscritos().add(this);
     }
 
     public void progredir(){
-
+        Optional<Conteudo> conteudo = this.conteudosInscritos.stream().findFirst();
+        if(conteudo.isPresent()){
+            this.conteudosAprovados.add(conteudo.get());
+            this.conteudosInscritos.remove(conteudo.get());
+        }
+        else {
+            System.err.println("Você não está matriulado em nenhum bootcamp!");
+        }
     }
 
-    public void calcularXp(){
-
+    public double calcularXp(){
+        return this.conteudosAprovados.stream().mapToDouble(Conteudo::calcularXP).sum();
     }
 
 
@@ -51,5 +60,9 @@ public class Dev {
     @Override
     public int hashCode() {
         return Objects.hash(nome, conteudosInscritos, conteudosAprovados);
+    }
+
+    public void setNome(String nome) {
+        this.nome = nome;
     }
 }
